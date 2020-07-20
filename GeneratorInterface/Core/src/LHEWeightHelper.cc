@@ -64,6 +64,25 @@ namespace gen {
         if (groupName.find(".") != std::string::npos)
           groupName.erase(groupName.find("."), groupName.size());
 
+        if ( weightIndex==0 && !WeightHelper::isScaleWeightGroup( {"", weightIndex, groupName, "", {{"",""}}, groupIndex} ) ) {
+          // putting the nominal PDF (or other) weight before scales is very unusual convention, likely the case of Madgraph version >= 2.6.5
+          groupName = "Central scale variation"; // override groupName manually
+
+          auto* inner = e->FirstChildElement("weight"); // expect only a single weight in the first weightgroup in the case
+
+          std::string text = "";
+          if (inner->GetText())
+            text = inner->GetText();
+
+          std::unordered_map<std::string, std::string> attributes;
+          for (auto* att = inner->FirstAttribute(); att != nullptr; att = att->Next())
+            attributes[att->Name()] = att->Value();
+
+          // put groupIndex 0 and make the next groupIndex also 0, as weightgroup(s) are essentially the same
+          parsedWeights_.push_back({inner->Attribute("id"), weightIndex++, groupName, text, attributes, groupIndex});
+          continue; // proceed to next weightgroup (which is now the (same) scale group)
+        }
+
         for (auto* inner = e->FirstChildElement("weight"); inner != nullptr;
              inner = inner->NextSiblingElement("weight")) {
           // we are here if there is a weight in a weightgroup
