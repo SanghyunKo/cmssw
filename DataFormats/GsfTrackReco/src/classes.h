@@ -12,6 +12,7 @@
 #include "DataFormats/Common/interface/AssociationMap.h"
 #include "DataFormats/Common/interface/RefHolder.h"
 #include "DataFormats/Common/interface/Holder.h"
+#include "DataFormats/Common/interface/ValueMap.h"
 #include <vector>
 
 namespace DataFormats_GsfTrackReco {
@@ -27,6 +28,8 @@ namespace DataFormats_GsfTrackReco {
     edm::Ref<reco::GsfTrackCollection> r2;
     edm::RefProd<reco::GsfTrackCollection> rp2;
     edm::RefVector<reco::GsfTrackCollection> rv2;
+    edm::Wrapper<edm::ValueMap<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> > > > valMap_wr;
+    edm::ValueMap<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> > > valMap;
 
     edm::helpers::Key< edm::RefProd < std::vector < reco::GsfTrack > > > rpt11;
     edm::AssociationMap<edm::OneToValue< std::vector<reco::GsfTrack>, double, unsigned int > > am11;

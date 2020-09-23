@@ -70,7 +70,7 @@ class ModifiedTowerIsolationProducer : public edm::stream::EDProducer<> {
 
   edm::EDGetTokenT<edm::View<reco::GsfElectron>> emObjectProducer_;
   edm::EDGetTokenT<CaloTowerCollection> towerProducer_;
-  edm::EDGetTokenT<edm::View<reco::GsfTrack>> gsfTrkToken_;
+  edm::EDGetTokenT<reco::GsfTrackCollection> gsfTrkToken_;
   // edm::InputTag emObjecProducer_;
   // edm::InputTag towerProducer_;
 

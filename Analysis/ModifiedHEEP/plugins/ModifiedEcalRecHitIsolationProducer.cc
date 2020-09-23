@@ -70,7 +70,7 @@ private:
   edm::EDGetTokenT<edm::View<reco::GsfElectron>> emObjectToken_;
   edm::EDGetTokenT<EcalRecHitCollection> ecalBarrelRecHitToken_;
   edm::EDGetTokenT<EcalRecHitCollection> ecalEndcapRecHitToken_;
-  edm::EDGetTokenT<edm::View<reco::GsfTrack>> gsfTrkToken_;
+  edm::EDGetTokenT<reco::GsfTrackCollection> gsfTrkToken_;
 
   double egIsoPtMinBarrel_; //minimum Et noise cut
   double egIsoEMinBarrel_;  //minimum E noise cut
