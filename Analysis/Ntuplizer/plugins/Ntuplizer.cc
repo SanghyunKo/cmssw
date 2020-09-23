@@ -165,6 +165,8 @@ class Ntuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       edm::EDGetTokenT<edm::ValueMap<float>> rtMatchedTrkToken;
       edm::EDGetTokenT<edm::ValueMap<bool>> addGsfTrkSelToken;
       edm::EDGetTokenT<edm::ValueMap<double>> EcalRecHitIsoToken;
+      edm::EDGetTokenT<edm::ValueMap<int>> noSelectedGsfTrkToken;
+      edm::EDGetTokenT<edm::ValueMap<reco::GsfTrackRef>> addGsfTrkToken;
 
       edm::EDGetTokenT<double> rhoToken;
 
@@ -216,6 +218,8 @@ nrMatchedTrkToken(consumes<edm::ValueMap<int>>(iConfig.getParameter<edm::InputTa
 rtMatchedTrkToken(consumes<edm::ValueMap<float>>(iConfig.getParameter<edm::InputTag>("rtMatchedTrkMap"))),
 addGsfTrkSelToken(consumes<edm::ValueMap<bool>>(iConfig.getParameter<edm::InputTag>("addGsfTrkSelMap"))),
 EcalRecHitIsoToken(consumes<edm::ValueMap<double>>(iConfig.getParameter<edm::InputTag>("EcalRecHitIsoMap"))),
+noSelectedGsfTrkToken(consumes<edm::ValueMap<int>>(iConfig.getParameter<edm::InputTag>("noSelectedGsfTrk"))),
+addGsfTrkToken(consumes<edm::ValueMap<reco::GsfTrackRef>>(iConfig.getParameter<edm::InputTag>("addGsfTrkMap"))),
 
 rhoToken(consumes<double>(iConfig.getParameter<edm::InputTag>("rho")))
 
@@ -537,11 +541,15 @@ void Ntuplizer::fillElectrons(const edm::Event& iEvent) {
   edm::Handle<edm::ValueMap<float>> rtMatchedTrkMap;
   edm::Handle<edm::ValueMap<bool>> addGsfTrkSelMap;
   edm::Handle<edm::ValueMap<double>> EcalRecHitIsoMap;
+  edm::Handle<edm::ValueMap<int>> noSelectedGsfTrkMap;
+  edm::Handle<edm::ValueMap<reco::GsfTrackRef>> addGsfTrkMap;
   // edm::Handle<edm::ValueMap<double>> HcalDepth1TowerSumEtMap;
   iEvent.getByToken(nrMatchedTrkToken, nrMatchedTrkMap);
   iEvent.getByToken(rtMatchedTrkToken, rtMatchedTrkMap);
   iEvent.getByToken(addGsfTrkSelToken, addGsfTrkSelMap);
   iEvent.getByToken(EcalRecHitIsoToken, EcalRecHitIsoMap);
+  iEvent.getByToken(noSelectedGsfTrkToken, noSelectedGsfTrkMap);
+  iEvent.getByToken(addGsfTrkToken, addGsfTrkMap);
 
   evt_.nElectrons = electrons->size();
   if(electrons->size() == 0) return;
@@ -640,6 +648,32 @@ void Ntuplizer::fillElectrons(const edm::Event& iEvent) {
     el_.HEEPrtMatchedTrk = (*rtMatchedTrkMap)[elPtr];
     el_.HEEPaddGsfTrkSel = (*addGsfTrkSelMap)[elPtr];
     el_.HEEPEcalRecHitIsoValue = (*EcalRecHitIsoMap)[elPtr];
+
+    el_.HEEPnoSelectedGsfTrk = (*noSelectedGsfTrkMap)[elPtr];
+    el_.HEEPaddGsfTrk_Gsfpt = (*addGsfTrkMap)[elPtr]->pt();
+    el_.HEEPaddGsfTrk_Gsfeta = (*addGsfTrkMap)[elPtr]->eta();
+    el_.HEEPaddGsfTrk_Gsfphi = (*addGsfTrkMap)[elPtr]->phi();
+    el_.HEEPaddGsfTrk_GsfptErr = (*addGsfTrkMap)[elPtr]->ptError();
+    el_.HEEPaddGsfTrk_lostHits = (*addGsfTrkMap)[elPtr]->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
+    el_.HEEPaddGsfTrk_nValidHits = (*addGsfTrkMap)[elPtr]->hitPattern().numberOfValidHits();
+    el_.HEEPaddGsfTrk_nValidPixelHits = (*addGsfTrkMap)[elPtr]->hitPattern().numberOfValidPixelHits();
+    el_.HEEPaddGsfTrk_chi2 = (*addGsfTrkMap)[elPtr]->normalizedChi2();
+    el_.HEEPaddGsfTrk_d0 = (*addGsfTrkMap)[elPtr]->d0();
+    el_.HEEPaddGsfTrk_d0Err = (*addGsfTrkMap)[elPtr]->d0Error();
+    el_.HEEPaddGsfTrk_dxyErr = (*addGsfTrkMap)[elPtr]->dxyError();
+    el_.HEEPaddGsfTrk_vz = (*addGsfTrkMap)[elPtr]->vz();
+    el_.HEEPaddGsfTrk_dzErr = (*addGsfTrkMap)[elPtr]->dzError();
+    el_.HEEPaddGsfTrk_dszErr = (*addGsfTrkMap)[elPtr]->dszError();
+
+    if (!PVHandle->empty() && !PVHandle->front().isFake()) {
+      el_.HEEPaddGsfTrk_dxy = (*addGsfTrkMap)[elPtr]->dxy(vtx.position());
+      el_.HEEPaddGsfTrk_dz = (*addGsfTrkMap)[elPtr]->dz(vtx.position());
+      el_.HEEPaddGsfTrk_dsz = (*addGsfTrkMap)[elPtr]->dsz(vtx.position());
+    } else {
+      el_.HEEPaddGsfTrk_dxy = (*addGsfTrkMap)[elPtr]->dxy();
+      el_.HEEPaddGsfTrk_dz = (*addGsfTrkMap)[elPtr]->dz();
+      el_.HEEPaddGsfTrk_dsz = (*addGsfTrkMap)[elPtr]->dsz();
+    }
 
     reco::GsfTrackRef TrackRef = el->gsfTrack();
     // el_.lostHits = TrackRef->lost();

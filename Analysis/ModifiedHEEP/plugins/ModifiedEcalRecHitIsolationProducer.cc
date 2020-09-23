@@ -179,7 +179,7 @@ ModifiedEcalRecHitIsolationProducer::produce(edm::Event& iEvent, const edm::Even
   edm::Handle<EcalRecHitCollection> ecalEndcapRecHitHandle;
   iEvent.getByToken(ecalEndcapRecHitToken_, ecalEndcapRecHitHandle);
 
-  edm::Handle<edm::View<reco::GsfTrack>> gsfTrkHandle;
+  edm::Handle<reco::GsfTrackCollection> gsfTrkHandle;
   iEvent.getByToken(gsfTrkToken_, gsfTrkHandle);
 
   edm::ESHandle<EcalSeverityLevelAlgo> sevlv;
@@ -217,19 +217,19 @@ ModifiedEcalRecHitIsolationProducer::produce(edm::Event& iEvent, const edm::Even
 
     bool addGsfTrkSel = false;
 
-    const reco::GsfTrack& additionalGsfTrk = trkIsoCalc_.additionalGsfTrkSelector(*emObjectHandle->ptrAt(i),*gsfTrkHandle, addGsfTrkSel);
+    auto additionalGsfTrk = trkIsoCalc_.additionalGsfTrkSelector(*emObjectHandle->ptrAt(i),gsfTrkHandle, addGsfTrkSel);
 
     if(tryBoth_){ //barrel + endcap
-      if(useIsolEt_) isoValue =  ecalBarrelIsol.getEtSum(&(emObjectHandle->at(i)),additionalGsfTrk) + ecalEndcapIsol.getEtSum(&(emObjectHandle->at(i)),additionalGsfTrk);
-      else           isoValue =  ecalBarrelIsol.getEnergySum(&(emObjectHandle->at(i)),additionalGsfTrk) + ecalEndcapIsol.getEnergySum(&(emObjectHandle->at(i)),additionalGsfTrk);
+      if(useIsolEt_) isoValue =  ecalBarrelIsol.getEtSum(&(emObjectHandle->at(i)),*(additionalGsfTrk.get())) + ecalEndcapIsol.getEtSum(&(emObjectHandle->at(i)),*(additionalGsfTrk.get()));
+      else           isoValue =  ecalBarrelIsol.getEnergySum(&(emObjectHandle->at(i)),*(additionalGsfTrk.get())) + ecalEndcapIsol.getEnergySum(&(emObjectHandle->at(i)),*(additionalGsfTrk.get()));
     }
     else if( fabs(superClus->eta())<1.479) { //barrel
-      if(useIsolEt_) isoValue =  ecalBarrelIsol.getEtSum(&(emObjectHandle->at(i)),additionalGsfTrk);
-      else           isoValue =  ecalBarrelIsol.getEnergySum(&(emObjectHandle->at(i)),additionalGsfTrk);
+      if(useIsolEt_) isoValue =  ecalBarrelIsol.getEtSum(&(emObjectHandle->at(i)),*(additionalGsfTrk.get()));
+      else           isoValue =  ecalBarrelIsol.getEnergySum(&(emObjectHandle->at(i)),*(additionalGsfTrk.get()));
     }
     else{ //endcap
-      if(useIsolEt_) isoValue =  ecalEndcapIsol.getEtSum(&(emObjectHandle->at(i)),additionalGsfTrk);
-      else           isoValue =  ecalEndcapIsol.getEnergySum(&(emObjectHandle->at(i)),additionalGsfTrk);
+      if(useIsolEt_) isoValue =  ecalEndcapIsol.getEtSum(&(emObjectHandle->at(i)),*(additionalGsfTrk.get()));
+      else           isoValue =  ecalEndcapIsol.getEnergySum(&(emObjectHandle->at(i)),*(additionalGsfTrk.get()));
     }
 
     //we subtract off the electron energy here as well

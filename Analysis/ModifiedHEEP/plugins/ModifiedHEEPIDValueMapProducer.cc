@@ -158,7 +158,7 @@ private:
   DualToken<edm::View<reco::GsfElectron> > eleToken_;
   // std::vector<DualToken<pat::PackedCandidateCollection> > candTokens_;
   std::vector<DualToken<reco::TrackCollection>> candTokens_;
-  DualToken<edm::View<reco::GsfTrack> > gsfTrkToken_;
+  DualToken<reco::GsfTrackCollection> gsfTrkToken_;
   edm::EDGetTokenT<reco::BeamSpot> beamSpotToken_;
 
   ModifiedEleTkIsolFromCands trkIsoCalc_;
@@ -172,6 +172,8 @@ private:
   static const std::string eleNrMatchedTrkLabel_;
   static const std::string eleRtMatchedTrkLabel_;
   static const std::string eleAddGsfTrkSelLabel_;
+  static const std::string eleNoSelectedGsfTrkLabel_;
+  static const std::string eleAddGsfTrkLabel_;
 };
 
 const std::string ModifiedHEEPIDValueMapProducer::eleTrkPtIsoLabel_="eleTrkPtIso";
@@ -180,6 +182,8 @@ const std::string ModifiedHEEPIDValueMapProducer::eleNrSaturateIn5x5Label_="eleN
 const std::string ModifiedHEEPIDValueMapProducer::eleNrMatchedTrkLabel_ = "eleNrMatchedTrk";
 const std::string ModifiedHEEPIDValueMapProducer::eleRtMatchedTrkLabel_ = "eleRtMatchedTrk";
 const std::string ModifiedHEEPIDValueMapProducer::eleAddGsfTrkSelLabel_ = "eleAddGsfTrkSel";
+const std::string ModifiedHEEPIDValueMapProducer::eleNoSelectedGsfTrkLabel_ = "eleNoSelectedGsfTrk";
+const std::string ModifiedHEEPIDValueMapProducer::eleAddGsfTrkLabel_ = "eleAddGsfTrk";
 
 
 
@@ -214,6 +218,8 @@ ModifiedHEEPIDValueMapProducer::ModifiedHEEPIDValueMapProducer(const edm::Parame
   produces<edm::ValueMap<int>>(eleNrMatchedTrkLabel_);
   produces<edm::ValueMap<float>>(eleRtMatchedTrkLabel_);
   produces<edm::ValueMap<bool>>(eleAddGsfTrkSelLabel_);
+  produces<edm::ValueMap<int>>(eleNoSelectedGsfTrkLabel_);
+  produces<edm::ValueMap<reco::GsfTrackRef>>(eleAddGsfTrkLabel_);
 }
 
 ModifiedHEEPIDValueMapProducer::~ModifiedHEEPIDValueMapProducer()
@@ -242,17 +248,21 @@ void ModifiedHEEPIDValueMapProducer::produce(edm::Event& iEvent, const edm::Even
   std::vector<int> eleNrMatchedTrk;
   std::vector<float> eleRtMatchedTrk;
   std::vector<bool> eleAddGsfTrkSel;
+  std::vector<int> eleNoSelectedGsfTrk;
+  std::vector<reco::GsfTrackRef> eleAddGsfTrk;
 
   for(size_t eleNr=0;eleNr<eleHandle->size();eleNr++){
-    int nrMatchedTrk = 0; float rtMatchedTrk = 0.0; bool addGsfTrkSel = false;
+    int nrMatchedTrk = 0; float rtMatchedTrk = 0.0; bool addGsfTrkSel = false; int noSelectedGsfTrk = 0;
     auto elePtr = eleHandle->ptrAt(eleNr);
-    const reco::GsfTrack& additionalGsfTrk = trkIsoCalc_.additionalGsfTrkSelector(*elePtr,*gsfTrkHandle, addGsfTrkSel);
-    eleTrkPtIso.push_back(calTrkIso(*elePtr,*eleHandle,candHandles,additionalGsfTrk,nrMatchedTrk,rtMatchedTrk,candVetos));
+    auto additionalGsfTrk = trkIsoCalc_.additionalGsfTrkSelector(*elePtr,gsfTrkHandle, addGsfTrkSel, noSelectedGsfTrk);
+    eleTrkPtIso.push_back(calTrkIso(*elePtr,*eleHandle,candHandles,*(additionalGsfTrk.get()),nrMatchedTrk,rtMatchedTrk,candVetos));
     eleNrSaturateIn5x5.push_back(nrSaturatedCrysIn5x5(*elePtr,ebRecHitHandle,eeRecHitHandle,caloTopoHandle));
 
     eleNrMatchedTrk.push_back(nrMatchedTrk);
     eleRtMatchedTrk.push_back(rtMatchedTrk);
     eleAddGsfTrkSel.push_back(addGsfTrkSel);
+    eleNoSelectedGsfTrk.push_back(noSelectedGsfTrk);
+    eleAddGsfTrk.push_back(additionalGsfTrk);
   }
 
   writeValueMap(iEvent,eleHandle,eleTrkPtIso,eleTrkPtIsoLabel_);
@@ -261,6 +271,8 @@ void ModifiedHEEPIDValueMapProducer::produce(edm::Event& iEvent, const edm::Even
   writeValueMap(iEvent,eleHandle,eleNrMatchedTrk,eleNrMatchedTrkLabel_);
   writeValueMap(iEvent,eleHandle,eleRtMatchedTrk,eleRtMatchedTrkLabel_);
   writeValueMap(iEvent,eleHandle,eleAddGsfTrkSel,eleAddGsfTrkSelLabel_);
+  writeValueMap(iEvent,eleHandle,eleNoSelectedGsfTrk,eleNoSelectedGsfTrkLabel_);
+  writeValueMap(iEvent,eleHandle,eleAddGsfTrk,eleAddGsfTrkLabel_);
 }
 
 int ModifiedHEEPIDValueMapProducer::nrSaturatedCrysIn5x5(const reco::GsfElectron& ele,

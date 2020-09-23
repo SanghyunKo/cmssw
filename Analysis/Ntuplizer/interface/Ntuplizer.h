@@ -204,6 +204,26 @@ public:
   double HEEPrtMatchedTrk;
   bool HEEPaddGsfTrkSel;
   double HEEPEcalRecHitIsoValue;
+  
+  int HEEPnoSelectedGsfTrk;
+  double HEEPaddGsfTrk_Gsfpt;
+  double HEEPaddGsfTrk_Gsfeta;
+  double HEEPaddGsfTrk_Gsfphi;
+  double HEEPaddGsfTrk_GsfptErr;
+  int HEEPaddGsfTrk_lostHits;
+  int HEEPaddGsfTrk_nValidHits;
+  int HEEPaddGsfTrk_nValidPixelHits;
+  double HEEPaddGsfTrk_chi2;
+  double HEEPaddGsfTrk_d0;
+  double HEEPaddGsfTrk_d0Err;
+  double HEEPaddGsfTrk_dxy;
+  double HEEPaddGsfTrk_dxyErr;
+  double HEEPaddGsfTrk_dz;
+  double HEEPaddGsfTrk_vz;
+  double HEEPaddGsfTrk_dzErr;
+  double HEEPaddGsfTrk_dsz;
+  double HEEPaddGsfTrk_dszErr;
+
   int lostHits;
   int validHits;
   int nValidHits;
@@ -220,8 +240,6 @@ public:
   double dzErr;
   double dsz;
   double dszErr;
-  double d0Vtx;
-  double d0VtxErr;
   double Gsfpt;
   double Gsfeta;
   double Gsfphi;

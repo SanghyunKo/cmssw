@@ -129,7 +129,7 @@ ModifiedTowerIsolationProducer::produce(edm::Event& iEvent, const edm::EventSetu
   iEvent.getByToken(towerProducer_, towerHandle);
   // iEvent.getByLabel(towerProducer_, towerHandle);
 
-  edm::Handle<edm::View<reco::GsfTrack>> gsfTrkHandle;
+  edm::Handle<reco::GsfTrackCollection> gsfTrkHandle;
   iEvent.getByToken(gsfTrkToken_, gsfTrkHandle);
 
   const CaloTowerCollection* towers = towerHandle.product();
@@ -147,9 +147,9 @@ ModifiedTowerIsolationProducer::produce(edm::Event& iEvent, const edm::EventSetu
 
   for( size_t i = 0 ; i < emObjectHandle->size(); ++i) {
     bool addGsfTrkSel = false;
-    const reco::GsfTrack& additionalGsfTrk = trkIsoCalc_.additionalGsfTrkSelector(*emObjectHandle->ptrAt(i),*gsfTrkHandle, addGsfTrkSel);
+    auto additionalGsfTrk = trkIsoCalc_.additionalGsfTrkSelector(*emObjectHandle->ptrAt(i),gsfTrkHandle, addGsfTrkSel);
 
-    double isoValue = myHadIsolation.getTowerEtSum(&(emObjectHandle->at(i)),additionalGsfTrk);
+    double isoValue = myHadIsolation.getTowerEtSum(&(emObjectHandle->at(i)),*(additionalGsfTrk.get()));
     retV[i]=isoValue;
   }
 

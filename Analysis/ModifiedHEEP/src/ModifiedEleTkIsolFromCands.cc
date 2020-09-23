@@ -219,24 +219,33 @@ bool ModifiedEleTkIsolFromCands::additionalGsfTrkSel(const reco::TrackBase& trk,
     trkPt > cuts.addGsfminPt;
 }
 
-const reco::GsfTrack& ModifiedEleTkIsolFromCands::additionalGsfTrkSelector(const reco::GsfElectron& ele, edm::View<reco::GsfTrack> gsfTrks, bool& addGsfTrkSel) {
-  std::vector<reco::GsfTrack> additionalGsfTrks;
-  const reco::GsfTrack& eleTrk = *ele.gsfTrack();
-  for (size_t gsfTrkNr = 0; gsfTrkNr < gsfTrks.size(); gsfTrkNr++) {
-    auto& gsfTrk = gsfTrks[gsfTrkNr];
-    if(gsfTrk.pt() == eleTrk.pt()) continue;
+const reco::GsfTrackRef ModifiedEleTkIsolFromCands::additionalGsfTrkSelector(const reco::GsfElectron& ele, edm::Handle<reco::GsfTrackCollection> gsfTrks, bool& addGsfTrkSel) {
+  int noSelectedGsfTrk = 0;
+  return additionalGsfTrkSelector(ele, gsfTrks, addGsfTrkSel, noSelectedGsfTrk);
+}
+
+const reco::GsfTrackRef ModifiedEleTkIsolFromCands::additionalGsfTrkSelector(const reco::GsfElectron& ele, edm::Handle<reco::GsfTrackCollection> gsfTrks, bool& addGsfTrkSel, int& noSelectedGsfTrk) {
+  std::vector<reco::GsfTrackRef> additionalGsfTrks;
+  const reco::GsfTrackRef eleTrk = ele.gsfTrack();
+  for (size_t gsfTrkNr = 0; gsfTrkNr < gsfTrks->size(); gsfTrkNr++) {
+    auto gsfTrk = gsfTrks->at(gsfTrkNr);
+    if( gsfTrk.pt()==eleTrk->pt() && gsfTrk.eta()==eleTrk->eta() && gsfTrk.phi()==eleTrk->phi() ) continue;
     const ModifiedEleTkIsolFromCands::TrkCuts& cuts = std::abs(gsfTrk.eta())<1.5 ? barrelCuts_ : endcapCuts_;
-    if(additionalGsfTrkSel(gsfTrk,gsfTrk.pt(),cuts,eleTrk.eta(),eleTrk.phi(),eleTrk.vz())) {
-      additionalGsfTrks.push_back(gsfTrk);
+    if(additionalGsfTrkSel(gsfTrk,gsfTrk.pt(),cuts,eleTrk->eta(),eleTrk->phi(),eleTrk->vz())) {
+      additionalGsfTrks.push_back(edm::Ref<reco::GsfTrackCollection>(gsfTrks,gsfTrkNr));
       addGsfTrkSel = true;
     }
   }
-  std::sort(additionalGsfTrks.begin(), additionalGsfTrks.end(), [](reco::GsfTrack a, reco::GsfTrack b) {return a.pt() > b.pt();} );
+  std::sort(additionalGsfTrks.begin(), additionalGsfTrks.end(), [](reco::GsfTrackRef a, reco::GsfTrackRef b) {return a->pt() > b->pt();} );
   if(additionalGsfTrks.empty()) {
-    return eleTrk;
     addGsfTrkSel = false;
+    noSelectedGsfTrk = 0;
+    return eleTrk;
   }
-  else return additionalGsfTrks.front();
+
+  noSelectedGsfTrk = additionalGsfTrks.size();
+
+  return additionalGsfTrks.front();
 }
 
 bool ModifiedEleTkIsolFromCands::

@@ -104,6 +104,8 @@ process.tree = cms.EDAnalyzer("Ntuplizer",
     rtMatchedTrkMap = cms.InputTag("ModifiedHEEPIDVarValueMaps","eleRtMatchedTrk"),
     addGsfTrkSelMap = cms.InputTag("ModifiedHEEPIDVarValueMaps","eleAddGsfTrkSel"),
     EcalRecHitIsoMap = cms.InputTag("ModifiedEcalRecHitIsolationScone","EcalRecHitIso"),
+    noSelectedGsfTrk = cms.InputTag("ModifiedHEEPIDVarValueMaps","eleNoSelectedGsfTrk"),
+    addGsfTrkMap = cms.InputTag("ModifiedHEEPIDVarValueMaps","eleAddGsfTrk")
 )
 
 process.p = cms.Path(

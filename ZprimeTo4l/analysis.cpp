@@ -20,7 +20,7 @@ void analysis(TString DataSet)
   if(DataSet=="QCD_EMEnriched_Pt_300toInf") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/QCD/QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8/QCD_EMEnriched_Pt-300toInf_Ntuplizer/200402_040649/0000/Ntuple_*.root");
 
   if(DataSet=="ZZTo4L") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/ZZTo4L/ZZTo4L_13TeV_powheg_pythia8/ZZTo4L_Ntuplizer_resub_v2/200831_065116/0000/Ntuple_*.root");
-  if(DataSet=="ZGTo2NuG_PtG130") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/ZG/ZGTo2NuG_PtG-130_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/ZGTo2NuG_PtG-130_Ntuplizer_resub/200611_101249/0000/Ntuple_*.root");
+  if(DataSet=="ZGTo2NuG_PtG130") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/ZG/ZGTo2NuG_PtG-130_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/ZGTo2NuG_PtG-130_Ntuplizer_resub_v2/200903_024214/0000/Ntuple_*.root");
   if(DataSet=="ZGTo2NuG") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/ZG/ZGTo2NuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/ZGTo2NuG_Ntuplizer_resub_v2/200831_065328/0000/Ntuple_*.root");
 
   if(DataSet=="H200A1") chain->Add("/u/user/sako/ModHEEP/CMSSW_8_0_32/src/Analysis/Ntuplizer/configs/H200A1.root");
@@ -79,11 +79,11 @@ void analysis(TString DataSet)
   TH1D* t_dPhiIn = new TH1D("dPhiIn","d#phi_{In}",200,-0.1,0.1); t_dPhiIn->Sumw2();
   TH1D* t_dEtaSeed = new TH1D("dEtaSeed","d#eta_{Seed}",200,-0.02,0.02); t_dEtaSeed->Sumw2();
 
-  TH1D* t_dxy = new TH1D("dxy","dxy",500,-0.5,0.5); t_dxy->Sumw2();
-  TH1D* t_dz = new TH1D("dz","dz",500,-10.,10.); t_dz->Sumw2();
+  TH1D* t_dxy = new TH1D("dxy","dxy",500,-0.05,0.05); t_dxy->Sumw2();
+  TH1D* t_dz = new TH1D("dz","dz",500,-0.1,0.1); t_dz->Sumw2();
 
-  TH1D* t_KFdxy = new TH1D("KFdxy","KFdxy",500,-0.5,0.5); t_KFdxy->Sumw2();
-  TH1D* t_KFdz = new TH1D("KFdz","KFdz",500,-10.,10.); t_KFdz->Sumw2();
+  TH1D* t_KFdxy = new TH1D("KFdxy","KFdxy",500,-0.05,0.05); t_KFdxy->Sumw2();
+  TH1D* t_KFdz = new TH1D("KFdz","KFdz",500,-0.1,0.1); t_KFdz->Sumw2();
 
   //
   // TEfficiency* tHEEPmodIsoPtEff = new TEfficiency("HEEPmodIsoPtEff","HEEP modified Iso eff vs Pt;p_{T};#epsilon",100,0.,ptHigh);
