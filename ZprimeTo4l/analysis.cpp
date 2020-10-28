@@ -19,13 +19,15 @@ void analysis(TString DataSet)
   if(DataSet=="QCD_EMEnriched_Pt_170to300") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/QCD/QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8/QCD_EMEnriched_Pt-170to300_Ntuplizer/200406_060252/0000/Ntuple_*.root");
   if(DataSet=="QCD_EMEnriched_Pt_300toInf") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/QCD/QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8/QCD_EMEnriched_Pt-300toInf_Ntuplizer/200402_040649/0000/Ntuple_*.root");
 
-  if(DataSet=="ZZTo4L") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/ZZTo4L/ZZTo4L_13TeV_powheg_pythia8/ZZTo4L_Ntuplizer_resub_v2/200831_065116/0000/Ntuple_*.root");
-  if(DataSet=="ZGTo2NuG_PtG130") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/ZG/ZGTo2NuG_PtG-130_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/ZGTo2NuG_PtG-130_Ntuplizer_resub_v2/200903_024214/0000/Ntuple_*.root");
-  if(DataSet=="ZGTo2NuG") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/ZG/ZGTo2NuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/ZGTo2NuG_Ntuplizer_resub_v2/200831_065328/0000/Ntuple_*.root");
+  if(DataSet=="ZZTo4L") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/ZZTo4L/ZZTo4L_13TeV_powheg_pythia8/ZZTo4L_Ntuplizer_resub_v4/201027_110459/0000/Ntuple_*.root");
+  if(DataSet=="ZGTo2NuG_PtG130") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/ZG/ZGTo2NuG_PtG-130_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/ZGTo2NuG_PtG-130_Ntuplizer_resub_v4/201027_110730/0000/Ntuple_*.root");
+  if(DataSet=="ZGTo2NuG") chain->Add("dcap://cluster142.knu.ac.kr//pnfs/knu.ac.kr/data/cms/store/user/sako/ZG/ZGTo2NuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/ZGTo2NuG_Ntuplizer_resub_v4/201027_110905/0000/Ntuple_*.root");
 
   if(DataSet=="H200A1") chain->Add("/u/user/sako/ModHEEP/CMSSW_8_0_32/src/Analysis/Ntuplizer/configs/H200A1.root");
   if(DataSet=="H800A1") chain->Add("/u/user/sako/ModHEEP/CMSSW_8_0_32/src/Analysis/Ntuplizer/configs/H800A1.root");
   if(DataSet=="H2000A1") chain->Add("/u/user/sako/ModHEEP/CMSSW_8_0_32/src/Analysis/Ntuplizer/configs/H2000A1.root");
+
+  if(DataSet=="cmsShow") chain->Add("/u/user/sako/ModHEEP/CMSSW_8_0_32/src/Analysis/Ntuplizer/configs/ZGPt130_cmsShow.root");
 
   if(DataSet=="test") chain->Add("Ntuple_1.root");
 
@@ -33,6 +35,8 @@ void analysis(TString DataSet)
   chain->SetBranchAddress("Event",&evt);
 
   double ptHigh = 1000.;
+  double invMass = 10.;
+  if (DataSet=="ZZTo4L") invMass = 200;
 
   TH1D* tNevt = new TH1D("nEvt","Num of Evt;;",1,0.,2.);
   TH1D* tNevt_1 = new TH1D("nEvt_1","Num of Eles;;",1,0.,2.);
@@ -84,6 +88,36 @@ void analysis(TString DataSet)
 
   TH1D* t_KFdxy = new TH1D("KFdxy","KFdxy",500,-0.05,0.05); t_KFdxy->Sumw2();
   TH1D* t_KFdz = new TH1D("KFdz","KFdz",500,-0.1,0.1); t_KFdz->Sumw2();
+
+  TH1D* t_HEEPnoSelectedGsfTrk = new TH1D("HEEPnoSelectedGsfTrk","# of additional Gsf trks candidates",10,0,10); t_HEEPnoSelectedGsfTrk->Sumw2();
+  TH1D* t_HEEPaddGsfTrk_Gsfpt = new TH1D("HEEPaddGsfTrk_Gsfpt","p_{T} of 2nd Gsf trk",200,0.0,ptHigh); t_HEEPaddGsfTrk_Gsfpt->Sumw2();
+  TH1D* t_HEEPaddGsfTrk_Gsfeta = new TH1D("HEEPaddGsfTrk_Gsfeta","#eta of 2nd Gsf trk",120,-3.,3.); t_HEEPaddGsfTrk_Gsfeta->Sumw2();
+  TH1D* t_HEEPaddGsfTrk_Gsfphi = new TH1D("HEEPaddGsfTrk_Gsfphi","#phi of 2nd Gsf trk",100,-4.,4.); t_HEEPaddGsfTrk_Gsfphi->Sumw2();
+  TH1D* t_HEEPaddGsfTrk_GsfptErr = new TH1D("HEEPaddGsfTrk_GsfptErr","Err(p_{T})/p_{T} of 2nd Gsf trk",200,0.,1.); t_HEEPaddGsfTrk_GsfptErr->Sumw2();
+  TH1D* t_HEEPaddGsfTrk_lostHits = new TH1D("HEEPaddGsfTrk_lostHits","# of list hits of 2nd Gsf trk",20,0.,20.); t_HEEPaddGsfTrk_lostHits->Sumw2();
+  TH1D* t_HEEPaddGsfTrk_nValidHits = new TH1D("HEEPaddGsfTrk_nValidHits","# of valid hits of 2nd Gsf trk",50,0.,50.); t_HEEPaddGsfTrk_nValidHits->Sumw2();
+  TH1D* t_HEEPaddGsfTrk_nValidPixelHits = new TH1D("HEEPaddGsfTrk_nValidPixelHits","# of valid pixel hits of 2nd Gsf trk",10,0.,10.); t_HEEPaddGsfTrk_nValidPixelHits->Sumw2();
+  TH1D* t_HEEPaddGsfTrk_chi2 = new TH1D("HEEPaddGsfTrk_chi2","Normalized #chi^2 of 2nd Gsf trk",200,0.,20.); t_HEEPaddGsfTrk_chi2->Sumw2();
+  TH1D* t_HEEPaddGsfTrk_d0 = new TH1D("HEEPaddGsfTrk_d0","d0 of 2nd Gsf trk",500,-0.5,0.5); t_HEEPaddGsfTrk_d0->Sumw2();
+  TH1D* t_HEEPaddGsfTrk_dxy = new TH1D("HEEPaddGsfTrk_dxy","dxy of 2nd Gsf trk",500,-0.1,0.1); t_HEEPaddGsfTrk_dxy->Sumw2();
+  TH1D* t_HEEPaddGsfTrk_dz = new TH1D("HEEPaddGsfTrk_dz","dz of 2nd Gsf trk",500,-0.1,0.1); t_HEEPaddGsfTrk_dz->Sumw2();
+
+  TH1D* t_convVtxFitProb = new TH1D("convVtxFitProb","convVtxFitProb",500,0.,1.); t_convVtxFitProb->Sumw2();
+  TH1D* t_convVtxChi2 = new TH1D("convVtxChi2","convVtxChi2",200,0.,20.); t_convVtxChi2->Sumw2();
+  TH1D* t_passConversionVeto = new TH1D("passConversionVeto","passConversionVeto",2,0.,2.); t_passConversionVeto->Sumw2();
+  TH1D* t_convDist = new TH1D("convDist","convDist",500,-0.5,0.5); t_convDist->Sumw2();
+  TH1D* t_convDcot = new TH1D("convDcot","convDcot",500,-0.5,0.5); t_convDcot->Sumw2();
+  TH1D* t_convRadius = new TH1D("convRadius","convRadius",500,-100.,100.); t_convRadius->Sumw2();
+
+  TH1D* t_HEEPaddVtx_isValid = new TH1D("HEEPaddVtx_isValid","HEEPaddVtx_isValid",2,0.,2.); t_HEEPaddVtx_isValid->Sumw2();
+  TH1D* t_HEEPaddVtx_dx = new TH1D("HEEPaddVtx_dx","HEEPaddVtx_dx",500,-0.5,0.5); t_HEEPaddVtx_dx->Sumw2();
+  TH1D* t_HEEPaddVtx_dy = new TH1D("HEEPaddVtx_dy","HEEPaddVtx_dy",500,-0.5,0.5); t_HEEPaddVtx_dy->Sumw2();
+  TH1D* t_HEEPaddVtx_dz = new TH1D("HEEPaddVtx_dz","HEEPaddVtx_dz",500,-0.5,0.5); t_HEEPaddVtx_dz->Sumw2();
+  TH1D* t_HEEPaddVtx_chi2 = new TH1D("HEEPaddVtx_chi2","HEEPaddVtx_chi2",200,0.,20.); t_HEEPaddVtx_chi2->Sumw2();
+  TH1D* t_HEEPaddVtx_pt = new TH1D("HEEPaddVtx_pt","HEEPaddVtx_pt",200,0.0,ptHigh); t_HEEPaddVtx_pt->Sumw2();
+  TH1D* t_HEEPaddVtx_rapidity = new TH1D("HEEPaddVtx_rapidity","HEEPaddVtx_rapidity",120,-3.,3.); t_HEEPaddVtx_rapidity->Sumw2();
+  TH1D* t_HEEPaddVtx_phi = new TH1D("HEEPaddVtx_phi","HEEPaddVtx_phi",100,-4.,4.); t_HEEPaddVtx_phi->Sumw2();
+  TH1D* t_HEEPaddVtx_M = new TH1D("HEEPaddVtx_M","HEEPaddVtx_M",500,0.,invMass); t_HEEPaddVtx_M->Sumw2();
 
   //
   // TEfficiency* tHEEPmodIsoPtEff = new TEfficiency("HEEPmodIsoPtEff","HEEP modified Iso eff vs Pt;p_{T};#epsilon",100,0.,ptHigh);
@@ -193,6 +227,41 @@ void analysis(TString DataSet)
 
             t_KFdxy->Fill(ele.KFdxy);
             t_KFdz->Fill(ele.KFdz);
+
+            t_HEEPnoSelectedGsfTrk->Fill(ele.HEEPnoSelectedGsfTrk);
+            t_HEEPaddGsfTrk_Gsfpt->Fill(ele.HEEPaddGsfTrk_Gsfpt);
+            t_HEEPaddGsfTrk_Gsfeta->Fill(ele.HEEPaddGsfTrk_Gsfeta);
+            t_HEEPaddGsfTrk_Gsfphi->Fill(ele.HEEPaddGsfTrk_Gsfphi);
+            t_HEEPaddGsfTrk_GsfptErr->Fill(ele.HEEPaddGsfTrk_GsfptErr/ele.HEEPaddGsfTrk_Gsfpt);
+            t_HEEPaddGsfTrk_lostHits->Fill(ele.HEEPaddGsfTrk_lostHits);
+            t_HEEPaddGsfTrk_nValidHits->Fill(ele.HEEPaddGsfTrk_nValidHits);
+            t_HEEPaddGsfTrk_nValidPixelHits->Fill(ele.HEEPaddGsfTrk_nValidPixelHits);
+            t_HEEPaddGsfTrk_chi2->Fill(ele.HEEPaddGsfTrk_chi2);
+            t_HEEPaddGsfTrk_d0->Fill(ele.HEEPaddGsfTrk_d0);
+            t_HEEPaddGsfTrk_dxy->Fill(ele.HEEPaddGsfTrk_dxy);
+            t_HEEPaddGsfTrk_dz->Fill(ele.HEEPaddGsfTrk_dz);
+
+            t_convVtxFitProb->Fill(ele.convVtxFitProb);
+            t_convVtxChi2->Fill(ele.convVtxChi2);
+            t_passConversionVeto->Fill(ele.passConversionVeto);
+            t_convDist->Fill(ele.convDist);
+            t_convDcot->Fill(ele.convDcot);
+            t_convRadius->Fill(ele.convRadius);
+
+            t_HEEPaddVtx_isValid->Fill(ele.HEEPaddVtx_isValid);
+
+            if (ele.HEEPaddVtx_isValid) {
+              t_HEEPaddVtx_dx->Fill(ele.HEEPaddVtx_dx);
+              t_HEEPaddVtx_dy->Fill(ele.HEEPaddVtx_dy);
+              t_HEEPaddVtx_dz->Fill(ele.HEEPaddVtx_dz);
+              t_HEEPaddVtx_chi2->Fill(ele.HEEPaddVtx_chi2);
+              t_HEEPaddVtx_pt->Fill(ele.HEEPaddVtx_pt);
+              t_HEEPaddVtx_rapidity->Fill(ele.HEEPaddVtx_rapidity);
+              t_HEEPaddVtx_phi->Fill(ele.HEEPaddVtx_phi);
+              t_HEEPaddVtx_M->Fill(ele.HEEPaddVtx_M);
+            }
+
+            if (DataSet=="cmsShow") std::cout << "run = " << evt->run << " lumi = " << evt->lumi << " event = " << evt->event << std::endl;
           }
         }
       }
@@ -232,6 +301,37 @@ void analysis(TString DataSet)
   t_dz->Write();
   t_KFdxy->Write();
   t_KFdz->Write();
+
+  t_HEEPnoSelectedGsfTrk->Write();
+  t_HEEPaddGsfTrk_Gsfpt->Write();
+  t_HEEPaddGsfTrk_Gsfeta->Write();
+  t_HEEPaddGsfTrk_Gsfphi->Write();
+  t_HEEPaddGsfTrk_GsfptErr->Write();
+  t_HEEPaddGsfTrk_lostHits->Write();
+  t_HEEPaddGsfTrk_nValidHits->Write();
+  t_HEEPaddGsfTrk_nValidPixelHits->Write();
+  t_HEEPaddGsfTrk_chi2->Write();
+  t_HEEPaddGsfTrk_d0->Write();
+  t_HEEPaddGsfTrk_dxy->Write();
+  t_HEEPaddGsfTrk_dz->Write();
+
+  t_convVtxFitProb->Write();
+  t_convVtxChi2->Write();
+  t_passConversionVeto->Write();
+  t_convDist->Write();
+  t_convDcot->Write();
+  t_convRadius->Write();
+
+  t_HEEPaddVtx_isValid->Write();
+  t_HEEPaddVtx_dx->Write();
+  t_HEEPaddVtx_dy->Write();
+  t_HEEPaddVtx_dz->Write();
+  t_HEEPaddVtx_chi2->Write();
+  t_HEEPaddVtx_pt->Write();
+  t_HEEPaddVtx_rapidity->Write();
+  t_HEEPaddVtx_phi->Write();
+  t_HEEPaddVtx_M->Write();
+
   // tHEEPnoIsoPt->Write();
   // tHEEPnoIsoEta->Write();
   // tHEEPmodIsoPt->Write();

@@ -50,9 +50,9 @@
 
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
 #include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
 #include "RecoVertex/VertexTools/interface/InvariantMassFromVertex.h"
+#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
 
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
@@ -167,6 +167,7 @@ class Ntuplizer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       edm::EDGetTokenT<edm::ValueMap<double>> EcalRecHitIsoToken;
       edm::EDGetTokenT<edm::ValueMap<int>> noSelectedGsfTrkToken;
       edm::EDGetTokenT<edm::ValueMap<reco::GsfTrackRef>> addGsfTrkToken;
+      edm::ParameterSet vtxFitterPset;
 
       edm::EDGetTokenT<double> rhoToken;
 
@@ -220,6 +221,7 @@ addGsfTrkSelToken(consumes<edm::ValueMap<bool>>(iConfig.getParameter<edm::InputT
 EcalRecHitIsoToken(consumes<edm::ValueMap<double>>(iConfig.getParameter<edm::InputTag>("EcalRecHitIsoMap"))),
 noSelectedGsfTrkToken(consumes<edm::ValueMap<int>>(iConfig.getParameter<edm::InputTag>("noSelectedGsfTrk"))),
 addGsfTrkToken(consumes<edm::ValueMap<reco::GsfTrackRef>>(iConfig.getParameter<edm::InputTag>("addGsfTrkMap"))),
+vtxFitterPset(iConfig.getParameter<edm::ParameterSet>("KFParameters")),
 
 rhoToken(consumes<double>(iConfig.getParameter<edm::InputTag>("rho")))
 
@@ -650,29 +652,31 @@ void Ntuplizer::fillElectrons(const edm::Event& iEvent) {
     el_.HEEPEcalRecHitIsoValue = (*EcalRecHitIsoMap)[elPtr];
 
     el_.HEEPnoSelectedGsfTrk = (*noSelectedGsfTrkMap)[elPtr];
-    el_.HEEPaddGsfTrk_Gsfpt = (*addGsfTrkMap)[elPtr]->pt();
-    el_.HEEPaddGsfTrk_Gsfeta = (*addGsfTrkMap)[elPtr]->eta();
-    el_.HEEPaddGsfTrk_Gsfphi = (*addGsfTrkMap)[elPtr]->phi();
-    el_.HEEPaddGsfTrk_GsfptErr = (*addGsfTrkMap)[elPtr]->ptError();
-    el_.HEEPaddGsfTrk_lostHits = (*addGsfTrkMap)[elPtr]->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
-    el_.HEEPaddGsfTrk_nValidHits = (*addGsfTrkMap)[elPtr]->hitPattern().numberOfValidHits();
-    el_.HEEPaddGsfTrk_nValidPixelHits = (*addGsfTrkMap)[elPtr]->hitPattern().numberOfValidPixelHits();
-    el_.HEEPaddGsfTrk_chi2 = (*addGsfTrkMap)[elPtr]->normalizedChi2();
-    el_.HEEPaddGsfTrk_d0 = (*addGsfTrkMap)[elPtr]->d0();
-    el_.HEEPaddGsfTrk_d0Err = (*addGsfTrkMap)[elPtr]->d0Error();
-    el_.HEEPaddGsfTrk_dxyErr = (*addGsfTrkMap)[elPtr]->dxyError();
-    el_.HEEPaddGsfTrk_vz = (*addGsfTrkMap)[elPtr]->vz();
-    el_.HEEPaddGsfTrk_dzErr = (*addGsfTrkMap)[elPtr]->dzError();
-    el_.HEEPaddGsfTrk_dszErr = (*addGsfTrkMap)[elPtr]->dszError();
+
+    reco::GsfTrackRef addGsfTrk = (*addGsfTrkMap)[elPtr];
+    el_.HEEPaddGsfTrk_Gsfpt = addGsfTrk->pt();
+    el_.HEEPaddGsfTrk_Gsfeta = addGsfTrk->eta();
+    el_.HEEPaddGsfTrk_Gsfphi = addGsfTrk->phi();
+    el_.HEEPaddGsfTrk_GsfptErr = addGsfTrk->ptError();
+    el_.HEEPaddGsfTrk_lostHits = addGsfTrk->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
+    el_.HEEPaddGsfTrk_nValidHits = addGsfTrk->hitPattern().numberOfValidHits();
+    el_.HEEPaddGsfTrk_nValidPixelHits = addGsfTrk->hitPattern().numberOfValidPixelHits();
+    el_.HEEPaddGsfTrk_chi2 = addGsfTrk->normalizedChi2();
+    el_.HEEPaddGsfTrk_d0 = addGsfTrk->d0();
+    el_.HEEPaddGsfTrk_d0Err = addGsfTrk->d0Error();
+    el_.HEEPaddGsfTrk_dxyErr = addGsfTrk->dxyError();
+    el_.HEEPaddGsfTrk_vz = addGsfTrk->vz();
+    el_.HEEPaddGsfTrk_dzErr = addGsfTrk->dzError();
+    el_.HEEPaddGsfTrk_dszErr = addGsfTrk->dszError();
 
     if (!PVHandle->empty() && !PVHandle->front().isFake()) {
-      el_.HEEPaddGsfTrk_dxy = (*addGsfTrkMap)[elPtr]->dxy(vtx.position());
-      el_.HEEPaddGsfTrk_dz = (*addGsfTrkMap)[elPtr]->dz(vtx.position());
-      el_.HEEPaddGsfTrk_dsz = (*addGsfTrkMap)[elPtr]->dsz(vtx.position());
+      el_.HEEPaddGsfTrk_dxy = addGsfTrk->dxy(vtx.position());
+      el_.HEEPaddGsfTrk_dz = addGsfTrk->dz(vtx.position());
+      el_.HEEPaddGsfTrk_dsz = addGsfTrk->dsz(vtx.position());
     } else {
-      el_.HEEPaddGsfTrk_dxy = (*addGsfTrkMap)[elPtr]->dxy();
-      el_.HEEPaddGsfTrk_dz = (*addGsfTrkMap)[elPtr]->dz();
-      el_.HEEPaddGsfTrk_dsz = (*addGsfTrkMap)[elPtr]->dsz();
+      el_.HEEPaddGsfTrk_dxy = addGsfTrk->dxy();
+      el_.HEEPaddGsfTrk_dz = addGsfTrk->dz();
+      el_.HEEPaddGsfTrk_dsz = addGsfTrk->dsz();
     }
 
     reco::GsfTrackRef TrackRef = el->gsfTrack();
@@ -709,6 +713,44 @@ void Ntuplizer::fillElectrons(const edm::Event& iEvent) {
     el_.Gsfpx = TrackRef->px();
     el_.Gsfpy = TrackRef->py();
     el_.Gsfpz = TrackRef->pz();
+
+    KalmanVertexFitter fitter(vtxFitterPset);
+    TransientVertex theVertex;
+    std::vector<reco::TransientTrack> Gsf12TT;
+
+    if ( TrackRef->pt()!=addGsfTrk->pt() || TrackRef->eta()!=addGsfTrk->eta() ) {
+      Gsf12TT.push_back(TTBuilder->build(TrackRef));
+      Gsf12TT.push_back(TTBuilder->build(addGsfTrk));
+      theVertex = fitter.vertex(Gsf12TT);
+    }
+
+    el_.HEEPaddVtx_isValid = theVertex.isValid();
+
+    if (theVertex.isValid()) {
+      reco::Vertex theRecoVtx = theVertex;
+
+      if (!PVHandle->empty() && !PVHandle->front().isFake()) {
+        el_.HEEPaddVtx_dx = theRecoVtx.x() - vtx.position().x();
+        el_.HEEPaddVtx_dy = theRecoVtx.y() - vtx.position().y();
+        el_.HEEPaddVtx_dz = theRecoVtx.z() - vtx.position().z();
+      } else {
+        el_.HEEPaddVtx_dx = theRecoVtx.x();
+        el_.HEEPaddVtx_dy = theRecoVtx.y();
+        el_.HEEPaddVtx_dz = theRecoVtx.z();
+      }
+
+      el_.HEEPaddVtx_chi2 = theRecoVtx.normalizedChi2();
+      el_.HEEPaddVtx_xErr = theRecoVtx.xError();
+      el_.HEEPaddVtx_yErr = theRecoVtx.yError();
+      el_.HEEPaddVtx_zErr = theRecoVtx.zError();
+
+      auto momentumSum = theRecoVtx.p4(0.0005109990615);
+      el_.HEEPaddVtx_pt = momentumSum.Pt();
+      el_.HEEPaddVtx_rapidity = momentumSum.Rapidity();
+      el_.HEEPaddVtx_phi = momentumSum.Phi();
+      el_.HEEPaddVtx_M = momentumSum.M();
+    }
+
     if (el->closestCtfTrackRef().isNonnull()) {
       el_.KFchi2 = el->closestCtfTrackRef()->normalizedChi2();
       el_.KFvalidHits = el->closestCtfTrackRef()->hitPattern().trackerLayersWithMeasurement();

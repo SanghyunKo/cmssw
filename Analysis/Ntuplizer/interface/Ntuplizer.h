@@ -204,7 +204,7 @@ public:
   double HEEPrtMatchedTrk;
   bool HEEPaddGsfTrkSel;
   double HEEPEcalRecHitIsoValue;
-  
+
   int HEEPnoSelectedGsfTrk;
   double HEEPaddGsfTrk_Gsfpt;
   double HEEPaddGsfTrk_Gsfeta;
@@ -223,6 +223,19 @@ public:
   double HEEPaddGsfTrk_dzErr;
   double HEEPaddGsfTrk_dsz;
   double HEEPaddGsfTrk_dszErr;
+
+  double HEEPaddVtx_isValid;
+  double HEEPaddVtx_dx;
+  double HEEPaddVtx_dy;
+  double HEEPaddVtx_dz;
+  double HEEPaddVtx_chi2;
+  double HEEPaddVtx_xErr;
+  double HEEPaddVtx_yErr;
+  double HEEPaddVtx_zErr;
+  double HEEPaddVtx_pt;
+  double HEEPaddVtx_rapidity;
+  double HEEPaddVtx_phi;
+  double HEEPaddVtx_M;  
 
   int lostHits;
   int validHits;
