@@ -208,6 +208,19 @@ slimmedElectronsWithUserData = cms.EDProducer("PATElectronUserDataEmbedder",
         energyScaleDownNew             = cms.InputTag("calibratedPatElectronsNano","energyScaleDown"),
         energySigmaUpNew               = cms.InputTag("calibratedPatElectronsNano","energySigmaUp"),
         energySigmaDownNew             = cms.InputTag("calibratedPatElectronsNano","energySigmaDown"),
+        addGsf_dxy = cms.InputTag("Modified2ndGsfValueMaps","addGsfDxy"),
+        addGsf_dxyErr = cms.InputTag("Modified2ndGsfValueMaps","addGsfDxyErr"),
+        addGsf_dz = cms.InputTag("Modified2ndGsfValueMaps","addGsfDz"),
+        addGsf_dzErr = cms.InputTag("Modified2ndGsfValueMaps","addGsfDzErr"),
+        addGsf_pt = cms.InputTag("Modified2ndGsfValueMaps","addGsfPt"),
+        addGsf_eta = cms.InputTag("Modified2ndGsfValueMaps","addGsfEta"),
+        addGsf_phi = cms.InputTag("Modified2ndGsfValueMaps","addGsfPhi"),
+        addGsf_ip3d = cms.InputTag("Modified2ndGsfValueMaps","addGsfIp3d"),
+        addGsf_sip3d = cms.InputTag("Modified2ndGsfValueMaps","addGsfSip3d"),
+        eleTrkPtIso = cms.InputTag("ModifiedHEEPIDVarValueMaps","eleTrkPtIso"),
+        eleTrkPtIso04 = cms.InputTag("ModifiedHEEPIDVarValueMaps","eleTrkPtIso04"),
+        EcalRecHitIso = cms.InputTag("ModifiedEcalRecHitIsolationScone","EcalRecHitIso"),
+        invertedEcalRecHitIso = cms.InputTag("ModifiedEcalRecHitIsolationScone","invertedEcalRecHitIso"),
     ),
     userIntFromBools = cms.PSet(
 
@@ -239,6 +252,11 @@ slimmedElectronsWithUserData = cms.EDProducer("PATElectronUserDataEmbedder",
         VIDNestedWPBitmap = cms.InputTag("bitmapVIDForEle"),
         VIDNestedWPBitmapHEEP = cms.InputTag("bitmapVIDForEleHEEP"),
         seedGain = cms.InputTag("seedGainEle"),
+        addGsf_charge = cms.InputTag("Modified2ndGsfValueMaps","addGsfCharge"),
+        addGsf_lostHits = cms.InputTag("Modified2ndGsfValueMaps","addGsfLostHits"),
+        addGsf_isHighPurityTrack = cms.InputTag("Modified2ndGsfValueMaps","addGsfIsHighPurityTrack"),
+        eleNrSaturateIn5x5 = cms.InputTag("ModifiedHEEPIDVarValueMaps","eleNrSaturateIn5x5"),
+        eleNumSelectedGsfTrk = cms.InputTag("ModifiedHEEPIDVarValueMaps","eleNumSelectedGsfTrk"),
     ),
     userCands = cms.PSet(
         jetForLepJetVar = cms.InputTag("ptRatioRelForEle:jetForLepJetVar") # warning: Ptr is null if no match is found
@@ -385,6 +403,24 @@ electronTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
         isPFcand = Var("pfCandidateRef().isNonnull()",bool,doc="electron is PF candidate"),
         seedGain = Var("userInt('seedGain')","uint8",doc="Gain of the seed crystal"),
         jetNDauCharged = Var("?userCand('jetForLepJetVar').isNonnull()?userFloat('jetNDauChargedMVASel'):0", "uint8", doc="number of charged daughters of the closest jet"),
+        addGsf_charge = Var("userInt('addGsf_charge')",int,doc="addGsf_charge"),
+        addGsf_lostHits = Var("userInt('addGsf_lostHits')",int,doc="addGsf_lostHits"),
+        addGsf_isHighPurityTrack = Var("userInt('addGsf_isHighPurityTrack')",int,doc="addGsf_isHighPurityTrack"),
+        addGsf_dxy = Var("userFloat('addGsf_dxy')",float,doc="addGsf_dxy"),
+        addGsf_dxyErr = Var("userFloat('addGsf_dxyErr')",float,doc="addGsf_dxyErr"),
+        addGsf_dz = Var("userFloat('addGsf_dz')",float,doc="addGsf_dz"),
+        addGsf_dzErr = Var("userFloat('addGsf_dzErr')",float,doc="addGsf_dzErr"),
+        addGsf_pt = Var("userFloat('addGsf_pt')",float,doc="addGsf_pt"),
+        addGsf_eta = Var("userFloat('addGsf_eta')",float,doc="addGsf_eta"),
+        addGsf_phi = Var("userFloat('addGsf_phi')",float,doc="addGsf_phi"),
+        addGsf_ip3d = Var("userFloat('addGsf_ip3d')",float,doc="addGsf_ip3d"),
+        addGsf_sip3d = Var("userFloat('addGsf_sip3d')",float,doc="addGsf_sip3d"),
+        ModTrkPtIso = Var("userFloat('eleTrkPtIso')",float,doc="eleTrkPtIso"),
+        ModTrkPtIso04 = Var("userFloat('eleTrkPtIso04')",float,doc="eleTrkPtIso04"),
+        ModEcalRecHitIso = Var("userFloat('EcalRecHitIso')",float,doc="EcalRecHitIso"),
+        ModInvertedEcalRecHitIso = Var("userFloat('invertedEcalRecHitIso')",float,doc="invertedEcalRecHitIso"),
+        ModNrSaturateIn5x5 = Var("userInt('eleNrSaturateIn5x5')",int,doc="eleNrSaturateIn5x5"),
+        ModNumSelectedGsfTrk = Var("userInt('eleNumSelectedGsfTrk')",int,doc="eleNumSelectedGsfTrk"),
     ),
     externalVariables = cms.PSet(
         mvaTTH = ExtVar(cms.InputTag("electronMVATTH"),float, doc="TTH MVA lepton ID score",precision=14),
@@ -532,8 +568,10 @@ electronMCTable = cms.EDProducer("CandMCMatchTableProducer",
     genparticles     = cms.InputTag("finalGenParticles"), 
 )
 
-
-electronSequence = cms.Sequence(bitmapVIDForEle + bitmapVIDForEleHEEP + isoForEle + ptRatioRelForEle + seedGainEle + slimmedElectronsWithUserData + finalElectrons)
+from ZprimeTo4l.ModifiedHEEP.ModifiedHEEPIdVarValueMapProducer_cfi import ModifiedHEEPIDVarValueMaps
+from ZprimeTo4l.ModifiedHEEP.ModifiedEcalRecHitIsolationScone_cfi import ModifiedEcalRecHitIsolationScone
+from ZprimeTo4l.ModifiedHEEP.Modified2ndGsfValueMapProducer_cfi import Modified2ndGsfValueMaps
+electronSequence = cms.Sequence(bitmapVIDForEle + bitmapVIDForEleHEEP + isoForEle + ptRatioRelForEle + seedGainEle + ModifiedHEEPIDVarValueMaps + ModifiedEcalRecHitIsolationScone + Modified2ndGsfValueMaps + slimmedElectronsWithUserData + finalElectrons)
 electronTables = cms.Sequence (electronMVATTH + electronTable)
 electronMCold = cms.Sequence(electronsMCMatchForTable + electronMCTable)
 electronMC = cms.Sequence(particleLevelForMatching + tautaggerForMatching + matchingElecPhoton + electronsMCMatchForTable + electronsMCMatchForTableAlt + electronMCTable)
@@ -556,6 +594,9 @@ for modifier in run2_miniAOD_80XLegacy,run2_nanoAOD_94XMiniAODv1,run2_nanoAOD_94
     modifier.toModify(seedGainEle, src = "slimmedElectronsUpdated")
     modifier.toModify(slimmedElectronsWithUserData, src = "slimmedElectronsUpdated")
     modifier.toModify(calibratedPatElectronsNano, src = "slimmedElectronsUpdated")
+    modifier.toModify(ModifiedHEEPIDVarValueMaps, elesMiniAOD="slimmedElectronsUpdated")
+    modifier.toModify(ModifiedEcalRecHitIsolationScone, emObjectProducer="slimmedElectronsUpdated")
+    modifier.toModify(Modified2ndGsfValueMaps, eleSrc="slimmedElectronsUpdated")
     ###this sequence should run for all eras except run2_nanoAOD_106Xv2 which should run the electronSequence as above
     _withULAndUpdate_sequence = cms.Sequence(slimmedElectronsUpdated + electronSequence.copy())
     modifier.toReplaceWith(electronSequence, _withULAndUpdate_sequence)
