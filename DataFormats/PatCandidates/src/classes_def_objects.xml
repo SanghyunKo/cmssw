@@ -488,6 +488,9 @@
   <class name="edm::Wrapper<std::vector<edm::Ptr<pat::PackedCandidate> > >" />
   <class name="edm::ValueMap<edm::Ptr<pat::PackedCandidate> >" />
   <class name="edm::Wrapper<edm::ValueMap<edm::Ptr<pat::PackedCandidate> > >" />
+  <class name="edm::ValueMap<edm::Ref<std::vector<pat::PackedCandidate>,pat::PackedCandidate,edm::refhelper::FindUsingAdvance<std::vector<pat::PackedCandidate>,pat::PackedCandidate> > >"/>
+  <class name="edm::Wrapper<edm::ValueMap<edm::Ref<std::vector<pat::PackedCandidate>,pat::PackedCandidate,edm::refhelper::FindUsingAdvance<std::vector<pat::PackedCandidate>,pat::PackedCandidate> > > >"/>
+  <class name="std::vector<edm::Ref<std::vector<pat::PackedCandidate>,pat::PackedCandidate,edm::refhelper::FindUsingAdvance<vector<pat::PackedCandidate>,pat::PackedCandidate> > >"/>
 
   <class name="std::vector<edm::Ptr<pat::PackedGenParticle> >" />
   <class name="edm::Wrapper<edm::Ptr<pat::PackedGenParticle> >" />

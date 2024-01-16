@@ -42,6 +42,9 @@
   <class name="edm::RefProd<std::vector<reco::GsfTrack> >"/>
   <class name="edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >"/>
   <class name="edm::RefVector<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> >"/>
+  <class name="edm::Wrapper<edm::ValueMap<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> > > >"/>
+  <class name="edm::ValueMap<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> > >"/>
+  <class name="std::vector<edm::Ref<std::vector<reco::GsfTrack>,reco::GsfTrack,edm::refhelper::FindUsingAdvance<std::vector<reco::GsfTrack>,reco::GsfTrack> > >"/>
 
   <class name="edm::helpers::Key< edm::RefProd < std::vector < reco::GsfTrack > > >" />
 
